@@ -34,7 +34,7 @@ class OperatorCollection(OperatorBase):
         print("# Pulling ToRead Items")
         print("#####################################################")
         collection_type = kwargs.setdefault("collection_type", "weekly")
-        sources = kwargs.setdefault("sources", ["Youtube", "Article", "Twitter", "RSS", "Reddit"])
+        sources = kwargs.setdefault("sources", ["Youtube", "Article", "RSS"])
 
         print(f"collection_type: {collection_type}, sources: {sources}")
 

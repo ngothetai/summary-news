@@ -300,7 +300,7 @@ class OperatorBase:
         print("#####################################################")
         print("# Pulling Pages: Takeaways ...")
         print("#####################################################")
-        sources = kwargs.setdefault("sources", ["Youtube", "Article", "Twitter", "RSS", "Reddit", "TODO", "DeepDive"])
+        sources = kwargs.setdefault("sources", ["Youtube", "Article", "RSS", "TODO", "DeepDive"])
         category = kwargs.setdefault("category", "todo")
 
         now = datetime.now()

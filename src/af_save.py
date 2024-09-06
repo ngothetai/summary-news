@@ -5,11 +5,9 @@ from datetime import datetime
 from dotenv import load_dotenv
 import utils
 
-from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
 from ops_rss import OperatorRSS
-from ops_reddit import OperatorReddit
 
 
 parser = argparse.ArgumentParser()
@@ -24,7 +22,7 @@ parser.add_argument("--job-id", help="job-id",
 parser.add_argument("--data-folder", help="data folder to save",
                     default="./data")
 parser.add_argument("--sources", help="sources to pull, comma separated",
-                    default=os.getenv("CONTENT_SOURCES", "Twitter,Reddit,Article,Youtube,RSS"))
+                    default=os.getenv("CONTENT_SOURCES", "Article,Youtube,RSS"))
 parser.add_argument("--targets", help="targets to push, comma separated",
                     default="notion")
 parser.add_argument("--topics-top-k", help="pick top-k topics to push",
@@ -39,48 +37,6 @@ parser.add_argument("--min-score-to-rank",
 parser.add_argument("--max-distance",
                     help="Max distance for similarity search, range [0.0, 1.0]",
                     default=0.5)
-
-
-def process_twitter(args):
-    """
-    Twitter has tons of tweets to process, apply embedding-based algo
-    to calcuate the candidates and merge/select into final data_ranked
-
-    The score source is based on user_rating field: [1, 5], ideally
-    >= 4 will be a good
-
-    cold start: user still filing GPT ranked score
-    warm/hot start: user can filter the new relevant score, e.g.
-                    filter score >= 4
-    """
-    print("#####################################################")
-    print("# Process Twitter")
-    print("#####################################################")
-    op = OperatorTwitter()
-    data = op.readFromJson(args.data_folder, args.run_id, "twitter.json")
-    data_deduped = op.dedup(data, target="toread")
-
-    # To save LLM tokens, do score on all deduped tweets, then
-    # do rank for score >= 4 tweets
-    data_scored = op.score(
-        data_deduped,
-        start_date=args.start,
-        max_distance=args.max_distance)
-
-    data_filtered = op.filter(data_scored, min_score=4)
-
-    data_ranked = op.rank(
-        data_filtered, min_score=args.min_score_to_rank)
-
-    targets = args.targets.split(",")
-    pushed_stats = op.push(
-        data_ranked, targets, args.topics_top_k, args.categories_top_k)
-
-    # Print and create stats
-    op.printStats("Twitter", data, data_deduped, data_ranked)
-    return op.createStats(
-        data, data_deduped, data_scored, data_filtered, data_ranked,
-        pushed_stats)
 
 
 def process_article(args):
@@ -175,50 +131,6 @@ def process_rss(args):
         pushed_stats=pushed_stats)
 
 
-def process_reddit(args):
-    """
-    Reddit has tons of posts to process, apply embedding-based algo
-    to calcuate the candidates and merge/select into final data_ranked
-
-    The score is based on user_rating field: [1, 5], ideally
-    >= 4 will be a good rating
-
-    cold start: user is still filing GPT ranked score
-    warm/hot start: user can filter the new relevant score, e.g.
-                    filter score >= 4
-    """
-    print("#####################################################")
-    print("# Process Reddit")
-    print("#####################################################")
-    op = OperatorReddit()
-    data = op.readFromJson(args.data_folder, args.run_id, "reddit.json")
-    data_deduped = op.dedup(data, target="toread")
-
-    # To save LLM tokens, do score on all deduped posts, then
-    # do rank for score >= 4 posts
-    data_scored = op.score(
-        data_deduped,
-        start_date=args.start,
-        max_distance=args.max_distance)
-
-    data_filtered = op.filter(data_scored, min_score=4)
-
-    data_summarized = op.summarize(data_filtered)
-    data_ranked = op.rank(
-        data_summarized, min_score=args.min_score_to_rank)
-
-    targets = args.targets.split(",")
-    pushed_stats = op.push(
-        data_ranked, targets, args.topics_top_k, args.categories_top_k)
-
-    # Print and create stats
-    op.printStats("Reddit", data, data_deduped, data_ranked)
-
-    return op.createStats(
-        data, data_deduped, data_scored, data_filtered,
-        data_summarized, data_ranked, pushed_stats)
-
-
 def run(args):
     sources = args.sources.split(",")
     stats = []
@@ -226,11 +138,7 @@ def run(args):
     for source in sources:
         print(f"Pushing data for source: {source} ...")
 
-        # Notes: For twitter we don't need summary step
-        if source == "Twitter":
-            stat = process_twitter(args)
-
-        elif source == "Article":
+        if source == "Article":
             stat = process_article(args)
 
         elif source == "Youtube":
@@ -238,9 +146,6 @@ def run(args):
 
         elif source == "RSS":
             stat = process_rss(args)
-
-        elif source == "Reddit":
-            stat = process_reddit(args)
 
         stats.extend(stat)
 

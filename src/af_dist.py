@@ -4,12 +4,10 @@ from datetime import date, datetime, timedelta
 
 from dotenv import load_dotenv
 
-from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
 from ops_obsidian import OperatorObsidian
 from ops_milvus import OperatorMilvus
-from ops_reddit import OperatorReddit
 import utils
 
 
@@ -26,7 +24,7 @@ parser.add_argument("--data-folder", help="data folder to save",
                     default="data")
 parser.add_argument("--sources",
                     help="sources to pull, comma separated",
-                    default=os.getenv("CONTENT_SOURCES", "Twitter,Reddit,Article,Youtube,RSS"))
+                    default=os.getenv("CONTENT_SOURCES", "Article,Youtube,RSS"))
 parser.add_argument("--targets",
                     help="targets to push, comma separated",
                     default="Milvus")
@@ -38,18 +36,6 @@ parser.add_argument("--dedup", help="whether dedup item",
 parser.add_argument("--past-days",
                     help="How many days in the past to process",
                     default=30)
-
-
-def process_twitter(args, folders):
-    print("#####################################################")
-    print("# Process Twitter")
-    print("#####################################################")
-    op = OperatorTwitter()
-    data = op.load_folders(folders, "twitter.json")
-    data_deduped = op.unique(data)
-    print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
-
-    return data_deduped
 
 
 def process_article(args, folders):
@@ -85,19 +71,6 @@ def process_rss(args, folders):
     op = OperatorYoutube()
 
     data = op.load_folders(folders, "rss.json")
-    data_deduped = op.unique(data)
-    print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
-
-    return data_deduped
-
-
-def process_reddit(args, folders):
-    print("#####################################################")
-    print(f"# Process Reddit, dedup: {args.dedup}")
-    print("#####################################################")
-    op = OperatorReddit()
-
-    data = op.load_folders(folders, "reddit.json")
     data_deduped = op.unique(data)
     print(f"data_deduped ({len(data_deduped.keys())}): {data_deduped}")
 
@@ -166,10 +139,7 @@ def run(args):
     data_deduped = {}
 
     for source in sources:
-        if source == "Twitter":
-            data_deduped = process_twitter(args, folders)
-
-        elif source == "Article":
+        if source == "Article":
             data_deduped = process_article(args, folders)
 
         elif source == "Youtube":
@@ -177,9 +147,6 @@ def run(args):
 
         elif source == "RSS":
             data_deduped = process_rss(args, folders)
-
-        elif source == "Reddit":
-            data_deduped = process_reddit(args, folders)
 
         for target in targets:
             dist(args, data_deduped, source, target)

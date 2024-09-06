@@ -56,10 +56,6 @@ class OperatorNotion:
             index_rss_list_db = agent.createDatabase_RSS_List(
                 "RSS_List", index_page["id"])
 
-            # create Tweet_list
-            index_tweets_list_db = agent.createDatabase_Tweets_List(
-                "Tweets_List", index_page["id"])
-
             db_cli.index_pages_table_insert(
                 "notion", "index_inbox_db_id", index_inbox_db["id"])
 
@@ -68,9 +64,6 @@ class OperatorNotion:
 
             db_cli.index_pages_table_insert(
                 "notion", "index_rss_list_db_id", index_rss_list_db["id"])
-
-            db_cli.index_pages_table_insert(
-                "notion", "index_tweets_list_db_id", index_tweets_list_db["id"])
 
             # create inbox-article database
             inbox_article_db = agent.createDatabase_Inbox(
@@ -105,7 +98,7 @@ class OperatorNotion:
                 description="ToRead Inbox Database"
             )
 
-            # create database item for rss and twitter list
+            # create database item for rss list
             agent.createDatabaseItem_Index(
                 index_inbox_db["id"],
                 index_rss_list_db["id"],
@@ -113,58 +106,9 @@ class OperatorNotion:
                 description="RSS List Database"
             )
 
-            agent.createDatabaseItem_Index(
-                index_inbox_db["id"],
-                index_tweets_list_db["id"],
-                source="Twitter",
-                description="Twitter List Database"
-            )
-
         except Exception as e:
             print(f"[ERROR] Errors in creating notion pages: {e}")
             raise
-
-    def init_reddit_pages(self, notion_agent=None):
-        print("Creating Reddit db and pages...")
-        agent = notion_agent
-        if not agent:
-            notion_api_key = os.getenv("NOTION_TOKEN")
-            agent = NotionAgent(notion_api_key)
-
-        db_cli = MySQLClient()
-        indexes = db_cli.index_pages_table_load()
-        print(f"loaded indexes: {indexes}")
-
-        notion_indexes = indexes.get("notion")
-        print(f"loaded notion indexes: {notion_indexes}")
-
-        index_page_id = notion_indexes["index_page_id"]["index_id"]
-        index_inbox_db_id = notion_indexes["index_inbox_db_id"]["index_id"]
-        reddit_list_db_id = notion_indexes.get("index_reddit_list_db_id")
-
-        print(f"index_page_id: {index_page_id}")
-        print(f"index_inbox_db_id: {index_inbox_db_id}")
-        print(f"reddit_list_db_id: {reddit_list_db_id}")
-
-        if reddit_list_db_id:
-            print(f"[INFO] Reddit list database is already created {reddit_list_db_id}, skip")
-            return
-
-        print("[notion] Creating Reddit list inbox database ...")
-        index_reddit_list_db = agent.createDatabase_Reddit_List(
-            "Reddit_List", index_page_id)
-
-        print("[notion] Update Inbox mapping ...")
-        agent.createDatabaseItem_Index(
-            index_inbox_db_id,
-            index_reddit_list_db["id"],
-            source="Reddit",
-            description="Reddit List Database"
-        )
-
-        print("[MySQL] Update Reddit list inbox database ...")
-        db_cli.index_pages_table_insert(
-            "notion", "index_reddit_list_db_id", index_reddit_list_db["id"])
 
     def get_index_inbox_dbid(self):
         """

@@ -101,7 +101,7 @@ Write a concise and precise one-liner summary of the following text without losi
 """
 
 LLM_PROMPT_TRANSLATION = """
-Translate the below content into {}:
+You are a helpful AI assistant. Translate the below content in proper {}:
 """
 
 LLM_PROMPT_TITLE = """

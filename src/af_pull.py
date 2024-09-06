@@ -4,11 +4,9 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 
-from ops_twitter import OperatorTwitter
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
 from ops_rss import OperatorRSS
-from ops_reddit import OperatorReddit
 import utils
 
 
@@ -24,32 +22,11 @@ parser.add_argument("--job-id", help="job-id",
 parser.add_argument("--data-folder", help="data folder to save",
                     default="./data")
 parser.add_argument("--sources", help="sources to pull, comma separated",
-                    default=os.getenv("CONTENT_SOURCES", "Twitter,Reddit,Article,Youtube,RSS"))
+                    default=os.getenv("CONTENT_SOURCES", "Article,Youtube,RSS"))
 parser.add_argument("--pulling-count", help="pulling count",
                     default=3)
 parser.add_argument("--pulling-interval", help="pulling interval (s)",
                     default=0.1)
-
-
-def pull_twitter(args, op):
-    print("######################################################")
-    print("# Pull from Twitter")
-    print("######################################################")
-
-    def run():
-        return op.pull(args.pulling_count, args.pulling_interval)
-
-    return utils.prun(run) or {}
-
-
-def save_twitter(args, op, data):
-    """
-    Save the middle result (json) to data folder
-    """
-    print("######################################################")
-    print("# Save Twitter data to json")
-    print("######################################################")
-    op.save2json(args.data_folder, args.run_id, "twitter.json", data)
 
 
 def pull_article(args, op):
@@ -115,30 +92,6 @@ def save_rss(args, op, data):
     op.save2json(args.data_folder, args.run_id, "rss.json", data)
 
 
-def pull_reddit(args, op):
-    """
-    Pull from Reddit
-    """
-    print("######################################################")
-    print("# Pull from Reddit")
-    print("######################################################")
-
-    def run():
-        pulling_count = os.getenv("REDDIT_PULLING_COUNT", 25)
-        return op.pull(
-            pulling_count=pulling_count, pulling_interval=0,
-            data_folder=args.data_folder, run_id=args.run_id)
-
-    return utils.prun(run) or {}
-
-
-def save_reddit(args, op, data):
-    print("######################################################")
-    print("# Save Reddit articles to json file")
-    print("######################################################")
-    op.save2json(args.data_folder, args.run_id, "reddit.json", data)
-
-
 def run(args):
     sources = args.sources.split(",")
     print(f"Sources: {sources}")
@@ -146,12 +99,7 @@ def run(args):
     for source in sources:
         print(f"Pulling from source: {source} ...")
 
-        if source == "Twitter":
-            op = OperatorTwitter()
-            data = pull_twitter(args, op)
-            save_twitter(args, op, data)
-
-        elif source == "Article":
+        if source == "Article":
             op = OperatorArticle()
             data = pull_article(args, op)
             save_article(args, op, data)
@@ -165,11 +113,6 @@ def run(args):
             op = OperatorRSS()
             data = pull_rss(args, op)
             save_rss(args, op, data)
-
-        elif source == "Reddit":
-            op = OperatorReddit()
-            data = pull_reddit(args, op)
-            save_reddit(args, op, data)
 
 
 if __name__ == "__main__":

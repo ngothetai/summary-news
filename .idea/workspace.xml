@@ -1,7 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="292f49fd-59a0-446e-a659-83371e642243" name="Changes" comment="" />
+    <list default="true" id="292f49fd-59a0-446e-a659-83371e642243" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.env.template" beforeDir="false" afterPath="$PROJECT_DIR$/.env.template" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/summary-news.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/summary-news.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/=0.4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/af_action_pull.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/af_action_pull.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/af_collect.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/af_collect.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/af_dist.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/af_dist.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/af_publish.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/af_publish.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/af_pull.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/af_pull.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/af_save.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/af_save.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/af_sync.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/af_sync.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/llm_prompts.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/llm_prompts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notion.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notion.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ops_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ops_base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ops_collection.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ops_collection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ops_notion.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ops_notion.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ops_reddit.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ops_twitter.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/patch_1.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/patch_1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/patch_2.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/patch_2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/patches.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/patches.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/reddit_agent.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tweets.py" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,10 +40,13 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 8
-}]]></component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2letBTyQRUmOsaVZSZIFeJiaNVc" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -22,7 +55,11 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "dev",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   }
@@ -44,7 +81,11 @@
       <option name="presentableId" value="Default" />
       <updated>1725552235320</updated>
       <workItem from="1725552236659" duration="4000" />
+      <workItem from="1725631362035" duration="2058000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>
