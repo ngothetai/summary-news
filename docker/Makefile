@@ -47,19 +47,13 @@ init-airflow:
 	docker compose --env-file ../build/.env up airflow-init
 
 # Platform targets
-# build repo=xxx tag=1.0.0
 build:
 	@echo "Building docker image, topdir: [$(topdir)]"
 	docker compose --env-file $(topdir)/build/.env build 
 
-# build repo=xxx tag=1.0.0
 build-nocache:
 	@echo "Building docker image (no-cache), topdir: [$(topdir)]"
 	docker compose --env-file $(topdir)/build/.env build --no-cache
-
-# push repo=xxx tag=1.0.0
-push:
-	docker push ${repo}:${tag}
 
 deploy: deploy-airflow deploy-postgres deploy-redis deploy-mysql deploy-milvus
 deploy: post-deploy

@@ -20,26 +20,6 @@ help:
 	@echo "\_ make info"
 	@echo "\_ make clean"
 	@echo ""
-	@echo "=== k8s deployment ==="
-	@echo "\_ make helm-repo-update"
-	@echo "\_ make k8s-env-create"
-	@echo "\_ make k8s-namespace-create"
-	@echo "\_ make k8s-secret-create"
-	@echo "\_ make k8s-docker-build repo=xxx tag=x.y.z"
-	@echo "\_ make k8s-docker-push repo=xxx tag=x.y.z"
-	@echo "\_ make k8s-helm-install"
-	@echo "\_ make k8s-airflow-dags-enable"
-	@echo ""
-	@echo "=== ArgoCD deployment ==="
-	@echo "\_ make k8s-argocd-install"
-	@echo "\_ make k8s-airflow-dags-enable"
-	@echo ""
-	@echo "=== k8s port-fowarding ==="
-	@echo "Airflow: 'kubectl port-forward service/news-summary-webserver 8080:8080 --namespace ${namespace} --address=0.0.0.0'"
-	@echo "Milvus : 'kubectl port-forward service/news-summary-milvus-attu -n ${namespace} 9100:3001 --address=0.0.0.0'"
-	@echo "Adminer: 'kubectl port-forward service/news-summary-adminer -n ${namespace} 8070:8080 --address=0.0.0.0'"
-
-
 topdir := $(shell pwd)
 build_dir := $(topdir)/build
 
@@ -65,9 +45,6 @@ prepare-env:
 		cp .env.template $(build_dir)/.env; \
 		echo "HOSTNAME=`hostname`" >> $(build_dir)/.env; \
 	fi
-	if [ ! -f $(build_dir)/.env.k8s ]; then \
-		cp .env.template.k8s $(build_dir)/.env.k8s; \
-	fi
 	chmod -R 777 $(build_dir)
 
 
@@ -76,17 +53,11 @@ prepare-env:
 deps: prepare-env
 # deps: docker-network
 
-repo ?= finaldie/news-summary
-tag ?= 0.9.13
-
 build:
-	cd docker && make build repo=$(repo) tag=$(tag) topdir=$(topdir)
+	cd docker && make build topdir=$(topdir)
 
 build-nocache:
-	cd docker && make build-nocache repo=$(repo) tag=$(tag) topdir=$(topdir)
-
-push:
-	cd docker && make push repo=$(repo) tag=$(tag)
+	cd docker && make build-nocache topdir=$(topdir)
 
 deploy-airflow:
 	cd docker && make deploy topdir=$(topdir) build_dir=$(build_dir)
@@ -138,126 +109,5 @@ upgrade:
 	@echo "[ops] Upgrading completed"
 	@echo "###########################"
 
-#######################################################################
-# K8S / Helm
-#######################################################################
-# -include build/.env.k8s
-
-TIMEOUT ?= 10m0s
-
-# steps to deploy to k8s:
-# make helm-repo-update
-# make k8s-env-create
-# make k8s-namespace-create
-# make k8s-secret-create
-# [optional] make k8s-docker-build repo=xxx tag=1.0.0
-# [optional] make k8s-docker-push repo=xxx tag=1.0.0
-# make k8s-helm-install
-# make k8s-airflow-dags-enable
-
-helm-repo-update:
-	helm repo add bitnami https://charts.bitnami.com/bitnami
-	helm repo add zilliztech https://zilliztech.github.io/milvus-helm
-	helm repo add apache-airflow https://airflow.apache.org
-	helm repo add cetic https://cetic.github.io/helm-charts
-	helm repo update
-
-k8s-namespace-create:
-	-kubectl create namespace ${namespace}
-
-k8s-env-create:
-	@echo "**Create env file for k8s**"
-	mkdir -p $(build_dir)
-	if [ ! -f $(build_dir)/.env.k8s ]; then \
-		cp .env.template.k8s $(build_dir)/.env.k8s; \
-	fi
-	@echo "Review and adjust $(build_dir)/.env.k8s if needed"
-
-k8s-secret-create:
-	@echo "**Create airflow secret (namespace: ${namespace})**"
-	-kubectl create secret generic airflow-secrets \
-	-n ${namespace} \
-	--from-env-file=build/.env.k8s
-
-k8s-secret-delete:
-	@echo "**Deleting airflow secret (namespace: ${namespace}) ...**"
-	-kubectl delete secret \
-		--ignore-not-found=true \
-		-n ${namespace} \
-		airflow-secrets
-
-# k8s-docker-build repo=xxx tag=1.0.0
-k8s-docker-build:
-	cd docker && make build repo=${repo} tag=${tag} topdir=$(topdir)
-
-# k8s-docker-push repo=xxx tag=1.0.0
-k8s-docker-push:
-	cd docker && make push repo=${repo} tag=${tag}
-
-k8s-helm-install:
-	cd ./helm && helm dependency build
-	helm upgrade \
-		--install \
-		--debug \
-		--namespace=${namespace} \
-		--create-namespace \
-		--timeout=${TIMEOUT} \
-		--wait-for-jobs=true \
-		news-summary \
-		./helm
-
-k8s-helm-uninstall:
-	helm uninstall \
-		--ignore-not-found \
-		--namespace=${namespace} \
-		--wait=true \
-		--debug \
-		news-summary
-
-k8s-airflow-dags-enable:
-	@echo "Airflow DAGs unpausing..."
-	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags unpause news_pulling
-	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags unpause sync_dist
-	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags unpause collection_weekly
-	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags unpause journal_daily
-	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags unpause action
-	@echo "Airflow DAGs unpausing finished"
-
-airflow-dags-disable:
-	@echo "Airflow DAGs pausing..."
-	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags pause news_pulling
-	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags pause sync_dist
-	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags pause collection_weekly
-	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags pause journal_daily
-	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags pause action
-	@echo "Airflow DAGs pausing finished"
-
-k8s-argocd-install:
-	@echo "ArgoCD: Installing news-summary argocd helm chart..."
-	helm upgrade \
-		--install \
-		--debug \
-		--namespace=${namespace} \
-		--create-namespace \
-		--timeout=${TIMEOUT} \
-		--wait=true \
-		argocd-apps-news-summary \
-		./argocd
-	@echo "ArgoCD: news-summary argocd helm chart installation finished, goto ArgoCD dashboard to check the service deployment status"
-
-# Notes: uninstall argocd helm chart won't uninstall the news-summary
-# services, to uninstall news-summary, click 'Delete' button from ArgoCD
-# dashboard
-k8s-argocd-uninstall:
-	@echo "ArgoCD uninstallation ..."
-	helm uninstall \
-		--ignore-not-found \
-		--wait=true \
-		--namespace=${namespace} \
-		--debug \
-		argocd-apps-news-summary
-
-
 .PHONY: deps build deploy deploy-env init start stop logs clean push_dags
 .PHONY: test upgrade enable_dags info ps help prepare-env docker-network
-.PHONY: k8s-docker-build k8s-docker-push
