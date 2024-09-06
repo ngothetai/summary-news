@@ -76,16 +76,6 @@ class DBClient(DBClientBase):
         key = key_tpl.format(source, category, item_id)
         self.driver.set(key, s, **kwargs)
 
-    def get_obsidian_inbox_item_id(self, source, category, item_id):
-        key_tpl = data_model.OBSIDIAN_INBOX_ITEM_ID
-        key = key_tpl.format(source, category, item_id)
-        return self.driver.get(key)
-
-    def set_obsidian_inbox_item_id(self, source, category, item_id, **kwargs):
-        key_tpl = data_model.OBSIDIAN_INBOX_ITEM_ID
-        key = key_tpl.format(source, category, item_id)
-        self.driver.set(key, "true", **kwargs)
-
     def get_embedding_item_id(self, source, provider, item_id):
         key_tpl = data_model.EMBEDDING_ITEM_ID
         key = key_tpl.format(source, provider, item_id)

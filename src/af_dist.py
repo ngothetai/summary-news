@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 
 from ops_article import OperatorArticle
 from ops_youtube import OperatorYoutube
-from ops_obsidian import OperatorObsidian
 from ops_milvus import OperatorMilvus
 import utils
 
@@ -85,23 +84,7 @@ def dist(args, data, source, target):
     print(f"# Data distribution, dedup: {args.dedup}, source: {source}, target: {target}, start_date: {args.start}")
     print("#####################################################")
     dedup = utils.str2bool(args.dedup)
-
-    if target == "Obsidian":
-        # TODO: The distribution part is only for weekly or monthly
-        #       job, to minimize the number of items
-        # op = OperatorObsidian()
-
-        # data_deduped = []
-        # if dedup:
-        #     data_deduped = op.dedup(data)
-        # else:
-        #     data_deduped = [page for page_id, page in data.items()]
-
-        # filtered = op.filters(data_deduped, min_rating=args.min_rating)
-        # op.push(filtered)
-        pass
-
-    elif target == "Milvus":
+    if target == "Milvus":
         op = OperatorMilvus()
 
         data_deduped = []

@@ -29,9 +29,6 @@ NOTION_RANKING_ITEM_ID = "notion_ranking_item_id_{}_{}_{}"
 # ttl: 2 weeks
 NOTION_SUMMARY_ITEM_ID = "notion_summary_item_id_{}_{}_{}"
 
-# key: prefix + source_name + list_name + id
-# val: true/false
-OBSIDIAN_INBOX_ITEM_ID = "obsidian_inbox_item_id_{}_{}_{}"
 
 # key: prefix + source_name + provider (openai/hf) + id
 # val: embedding data

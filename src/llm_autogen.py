@@ -264,25 +264,21 @@ class LLMAgentAutoGen(LLMAgentBase):
         super().__init__("", "")
 
         _gpt4_model_name = os.getenv("AUTOGEN_GPT4_MODEL", "gpt-4-1106-preview")
-        _gpt4_api_version = os.getenv("AUTOGEN_GPT4_API_VERSION", "2023-08-01-preview")
         _gpt4_api_key = os.getenv("AUTOGEN_GPT4_API_KEY", "")
 
         # create autogen user proxy and assisants
         self.gpt4_config_list = [{
             "model": _gpt4_model_name,
-            "api_version": _gpt4_api_version,
             "api_key": _gpt4_api_key,
         }]
 
-        print(f"[LLMAgentAutoGen] Initialize GPT4 model_name: {_gpt4_model_name}, api_version: {_gpt4_api_version}")
+        print(f"[LLMAgentAutoGen] Initialize GPT4 model_name: {_gpt4_model_name}")
 
         _gpt3_model_name = os.getenv("AUTOGEN_GPT3_MODEL", "gpt-3.5-turbo-1106")
-        _gpt3_api_version = os.getenv("AUTOGEN_GPT3_API_VERSION", "2023-08-01-preview")
         _gpt3_api_key = os.getenv("AUTOGEN_GPT3_API_KEY", "")
 
         self.gpt3_config_list = [{
             "model": _gpt3_model_name,
-            "api_version": _gpt3_api_version,
             "api_key": _gpt3_api_key,
         }]
 
@@ -387,7 +383,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             },
         ]
 
-        print(f"[LLMAgentAutoGen] Initialize GPT3 model_name: {_gpt3_model_name}, api_version: {_gpt3_api_version}")
+        print(f"[LLMAgentAutoGen] Initialize GPT3 model_name: {_gpt3_model_name}")
 
         self.llm_cfg_timeout = 180  # seconds
         self.llm_cfg_max_retries = 5
@@ -497,47 +493,74 @@ class LLMAgentAutoGen(LLMAgentBase):
     ):
         print(f"[LLMAgentAutoGen.collect] query: {query}, work_dir: {work_dir}, filename: {filename}")
 
-        user_proxy = autogen.UserProxyAgent(
-            name="UserProxy",
-            is_termination_msg=lambda x: x.get("content", "") and "TERMINATE" in "\n".join(x.get("content", "").rstrip().split("\n")[-2:]),
-            human_input_mode="NEVER",
-            # max_consecutive_auto_reply=10,
-            code_execution_config={
-                "last_n_messages": 2,
-                "work_dir": work_dir,
-            },
-            system_message="A human admin. Interact with the editor to discuss the plan." + self.termination_notice,
-        )
+        try:
+            user_proxy = autogen.UserProxyAgent(
+                name="UserProxy",
+                is_termination_msg=lambda x: x.get("content", "") and "TERMINATE" in "\n".join(x.get("content", "").rstrip().split("\n")[-2:]),
+                human_input_mode="NEVER",
+                # max_consecutive_auto_reply=10,
+                code_execution_config={
+                    "last_n_messages": 2,
+                    "work_dir": work_dir,
+                },
+                system_message="A human admin. Interact with the editor to discuss the plan." + self.termination_notice,
+            )
+        except Exception as e:
+            print(f"Error creating UserProxyAgent: {str(e)}")
+            raise
 
-        user_proxy.register_function(
-            function_map={
-                "search": search,
-                # "scrape": scrape,
-                "arxiv": arxiv_search,
-            }
-        )
+        try:
+            user_proxy.register_function(
+                function_map={
+                    "search": search,
+                    # "scrape": scrape,
+                    "arxiv": arxiv_search,
+                }
+            )
+        except Exception as e:
+            print(f"Error registering functions: {str(e)}")
+            raise
 
         # pass values to functions via env
-        os.environ["AN_CURRENT_WORKDIR"] = work_dir
-        os.environ["AN_COLLECTION_FILENAME"] = filename
-        os.environ["AN_REF_FILENAME"] = ref_filename
-        os.environ["AN_AUTO_SCRAPE_ENABLED"] = "True"
+        try:
+            os.environ["AN_CURRENT_WORKDIR"] = work_dir
+            os.environ["AN_COLLECTION_FILENAME"] = filename
+            os.environ["AN_REF_FILENAME"] = ref_filename
+            os.environ["AN_AUTO_SCRAPE_ENABLED"] = "True"
+        except Exception as e:
+            print(f"Error setting environment variables: {str(e)}")
+            raise
 
-        user_proxy.initiate_chat(
-            self.agent_collector,
-            message=query,
-        )
+        try:
+            user_proxy.initiate_chat(
+                self.agent_collector,
+                message=query,
+            )
+        except Exception as e:
+            print(f"Error initiating chat: {str(e)}")
+            raise
 
-        data = user_proxy.last_message()["content"]
-        print(f"collected (returned): {data}")
+        try:
+            data = user_proxy.last_message()["content"]
+            print(f"collected (returned): {data}")
+        except Exception as e:
+            print(f"Error getting last message: {str(e)}")
+            data = None
 
         # Tips: agent returned value may not reliable to use,
         # use file-based output instead
-        full_path = f"{work_dir}/{filename}"
-        data_from_file = utils.prun(utils.read_file, full_path=full_path)
-        print(f"collected (from file): {data_from_file}")
+        try:
+            full_path = f"{work_dir}/{filename}"
+            data_from_file = utils.prun(utils.read_file, full_path=full_path)
+            print(f"collected (from file): {data_from_file}")
+        except Exception as e:
+            print(f"Error reading from file: {str(e)}")
+            data_from_file = None
 
-        return data_from_file
+        if data_from_file is None and data is None:
+            raise Exception("Failed to collect data from both agent and file")
+
+        return data_from_file or data
 
     def gen_article(
         self,
