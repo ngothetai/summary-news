@@ -97,6 +97,26 @@ x-airflow-common:
       condition: service_healthy
 
 services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    networks:
+      - bot_network
+    ports:
+      - "11434:11434"
+    volumes:
+      - ${OLLAMA_PROJ_DIR:-./workspace/ollama}:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+  
   postgres:
     image: postgres:13
     networks:
