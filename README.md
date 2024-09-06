@@ -36,8 +36,7 @@ For more background, see this [Blog post](https://finaldie.com/blog/news-summary
 - Filter content based on personal interests and remove 80%+ noises
 - Weekly Top-k Recap
 - Unified and central reading experience (RSS reader-like style, Notion-based)
-- Generate `TODO` list from takeaways and journal notes
-- Organize Journal notes with insights daily
+- Generate `TODO` list from takeaways notes
 - [Multi-Agents] **Experimental** [Deepdive](https://github.com/finaldie/news-summary/wiki/Deepdive-(Experimental)) topic via web search agent and [autogen](https://github.com/microsoft/autogen)
 - Multi-LLM backend: OpenAI ChatGPT, Google Gemini, Ollama
 

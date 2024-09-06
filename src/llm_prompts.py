@@ -100,25 +100,6 @@ Write a concise and precise one-liner summary of the following text without losi
 {text}
 """
 
-LLM_PROMPT_JOURNAL_PREFIX = """
-You have a series of random journal notes that need refinement and rewriting without altering their original meaning.
-
-Your goal is to:
-- Make the journal entry more cohesive, polished, and organized while preserving the essence of the original content.
-"""
-
-# In case need a translation
-LLM_PROMPT_JOURNAL_MIDDLE = """
-- For all the above goals, write one English version, then translate it to {} (including insights, takeaways, and action items), and use === as the delimiter.
-"""
-
-LLM_PROMPT_JOURNAL_SUFFIX = """
-Before responding to the output, review it carefully and make sure it meets all the above goals.
-
-Take the provided notes below and craft a well-structured journal entry:
-{content}
-"""
-
 LLM_PROMPT_TRANSLATION = """
 Translate the below content into {}:
 """

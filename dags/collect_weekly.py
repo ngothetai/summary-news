@@ -43,7 +43,7 @@ def should_run(**kwargs):
     :rtype: str
     """
     next_exec_date = kwargs['next_execution_date']
-    force_to_run = kwargs["dag_run"].conf.setdefault("force_to_run", False)
+    force_to_run = kwargs["dag_run"].conf.setdefault("force_to_run", True)
 
     print('---- weekday: {}, force_to_run: {}, context {}'.format(next_exec_date.weekday(), force_to_run, kwargs))
 

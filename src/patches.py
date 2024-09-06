@@ -18,13 +18,7 @@ PATCHES_TABLE = [
         "name": "init_notion_reddit",
         "order_id": 1,
         "function": patch_1.apply,
-    },
-
-    {
-        "name": "init_notion_journal",
-        "order_id": 2,
-        "function": patch_2.apply,
-    },
+    }
 ]
 
 

@@ -208,7 +208,7 @@ class OperatorDeepDive(OperatorBase):
             tot += 1
             print(f"======= [Generating DeepDive] page id: {page['id']}, title: {page['title']}")
 
-            # This is the takeaways or journal content
+            # This is the takeaways content
             content = page["__content"]
             print(f"Raw query: {content}")
 

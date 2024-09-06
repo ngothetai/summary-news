@@ -29,7 +29,6 @@ def pull_todo(args, op):
 
     # Pull from non-TODO sources (past N days)
     # - Takeaways
-    # - Journal notes
     sources = ["Youtube", "Article", "Twitter", "RSS", "Reddit"]
     data = op.pull(sources=sources, category="todo")
     return data
@@ -52,7 +51,7 @@ def pull_deepdive(args, op):
 
     # Pull from non-TODO sources (past N days)
     # - Takeaways
-    sources = ["Youtube", "Article", "Twitter", "RSS", "Reddit", "Journal", "TODO", "DeepDive"]
+    sources = ["Youtube", "Article", "Twitter", "RSS", "Reddit", "TODO", "DeepDive"]
     data = op.pull(sources=sources, category="deepdive")
     return data
 

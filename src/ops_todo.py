@@ -34,11 +34,9 @@ class OperatorTODO(OperatorBase):
         @return pages <id, page>
         """
         takeaways_pages = self.pull_takeaways(**kwargs)
-        journal_pages = self.pull_journal(**kwargs)
 
         return {
-            "takeaways": takeaways_pages,
-            "journal": journal_pages,
+            "takeaways": takeaways_pages
         }
 
     def dedup(self, pages):
@@ -46,17 +44,13 @@ class OperatorTODO(OperatorBase):
         print("# TODO: dedup")
         print("#####################################################")
         takeaways_pages = pages["takeaways"]
-        journal_pages = pages["journal"]
 
         dedup_takeaways_pages = self._dedup(takeaways_pages)
-        dedup_journal_pages = self._dedup(journal_pages)
 
         print(f"Total takeaways {len(takeaways_pages)}, post dedup {len(dedup_takeaways_pages)}")
-        print(f"Total journal {len(journal_pages)}, post dedup {len(dedup_journal_pages)}")
 
         return {
             "takeaways": dedup_takeaways_pages,
-            "journal": dedup_journal_pages,
         }
 
     def _dedup(self, pages):
@@ -85,22 +79,15 @@ class OperatorTODO(OperatorBase):
         print("#####################################################")
 
         takeaways_pages = pages["takeaways"]
-        journal_pages = pages["journal"]
 
         print(f"Total takeaways pages: {len(takeaways_pages)}")
-        print(f"Total journal pages: {len(journal_pages)}")
 
         extracted_takeaways_pages = self._get_takeaways_from_pages(takeaways_pages)
         print(f"Pages contains takeaways: {len(extracted_takeaways_pages)}")
 
-        extracted_journal_pages = self._get_journals_from_pages(journal_pages)
-
-        print(f"Pages contains journals: {len(extracted_journal_pages)}")
-
         extracted_pages = []
         extracted_pages.extend(extracted_takeaways_pages)
-        extracted_pages.extend(extracted_journal_pages)
-
+        
         llm_agent_todo = LLMAgentGeneric()
         llm_agent_todo.init_prompt(llm_prompts.LLM_PROMPT_ACTION_ITEM)
         llm_agent_todo.init_llm()
@@ -111,16 +98,16 @@ class OperatorTODO(OperatorBase):
 
         todo_pages = []
 
-        excluded_sources = ["TODO", "Journal"]
+        excluded_sources = ["TODO"]
 
         for page in extracted_pages:
             tags = page.get("tags") or []
 
             print(f"======= [Generating] page id: {page['id']}, title: {page['title']}, tags: {tags}")
-            # This is the takeaways or journal content
+            # This is the takeaways content
             content = page["__content"]
 
-            print(f"Content (Takeaways or Journal-notes): {content}")
+            print(f"Content (Takeawayss): {content}")
 
             try:
                 if page["source"] in excluded_sources:
@@ -170,21 +157,6 @@ class OperatorTODO(OperatorBase):
             takeaway_pages.append(page)
 
         return takeaway_pages
-
-    def _get_journals_from_pages(self, pages, **kwargs):
-        journal_pages = []
-
-        for page_id, raw_page in pages.items():
-            content = f"{raw_page['title']} {raw_page['content']}"
-
-            if not content:
-                continue
-
-            page = copy.deepcopy(raw_page)
-            page["__content"] = content
-            journal_pages.append(page)
-
-        return journal_pages
 
     def push(self, pages, targets, **kwargs):
         print("#####################################################")

@@ -49,7 +49,7 @@ init-airflow:
 # Platform targets
 build:
 	@echo "Building docker image, topdir: [$(topdir)]"
-	docker compose --env-file $(topdir)/build/.env build 
+	docker compose --env-file $(topdir)/build/.env build
 
 build-nocache:
 	@echo "Building docker image (no-cache), topdir: [$(topdir)]"
@@ -93,7 +93,6 @@ enable_dags:
 	docker compose run airflow-cli airflow dags unpause sync_dist
 	docker compose run airflow-cli airflow dags unpause collection_weekly
 	docker compose run airflow-cli airflow dags unpause upgrade
-	docker compose run airflow-cli airflow dags unpause journal_daily
 
 push_dags:
 	test -d $(AIRFLOW_PROJ_DIR)/dags || mkdir -p $(AIRFLOW_PROJ_DIR)/dags

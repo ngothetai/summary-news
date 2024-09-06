@@ -97,7 +97,7 @@ push_dags:
 
 test:
 	# cd docker && docker-compose run airflow-init-user
-	cd docker && docker-compose run airflow-cli airflow dags trigger journal_daily
+	cd docker && docker-compose run airflow-cli airflow dags trigger
 
 upgrade:
 	@echo "###########################"
