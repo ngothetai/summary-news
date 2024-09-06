@@ -40,7 +40,7 @@ with DAG(
         max_active_runs=1,
         description='news pulling, config: {"sources":  "targets": "notion", '
                     '"dedup": true}',
-        schedule_interval="15 * * * *",  # At minute 15 every hour
+        schedule_interval=timedelta(minutes=3),  # At minute 15 every hour
         # schedule_interval=timedelta(minutes=60),
         # schedule_interval=None,
         start_date=days_ago(0),

@@ -39,7 +39,7 @@ with DAG(
     max_active_runs=1,
     description='Action DAG, for generating TODO, Q&A, deep-dive, etc. config: {"targets": "notion"}',
     # schedule_interval=timedelta(minutes=60),
-    schedule_interval="*/60 * * * *",  # Every 60 minutes
+    schedule_interval=timedelta(minutes=10),
     # schedule_interval=None,
     start_date=days_ago(1),
     tags=['NewsBot'],

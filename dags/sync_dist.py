@@ -45,7 +45,7 @@ with DAG(
         # schedule_interval=timedelta(minutes=60),
         # schedule_interval="1 * * * *",  # At minute 01 every hour
         # schedule_interval=None,
-        schedule_interval='@hourly',
+        schedule_interval=timedelta(minutes=3),
         start_date=days_ago(0, hour=1),
         tags=['NewsBot'],
 ) as dag:
