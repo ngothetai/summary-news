@@ -1,9 +1,9 @@
 [project]
-name = "auto-news"
+name = "news-summary"
 version = "0.1.0"
-description = "AutoNews backend"
+description = "NewsSummary backend"
 authors = [
-    { name = "Yuzhang Hu", email = "hyzwowtools@gmail.com" }
+    { name = "taingo", email = "thetai2382002@gmail.com" }
 ]
 dependencies = [
     "SpeechRecognition",
@@ -57,9 +57,9 @@ requires-python = ">= 3.9"
 # hello = "airflow:hello"
 
 [project.urls]
-Homepage = "https://github.com/finaldie/auto-news"
-Documentation = "https://github.com/finaldie/auto-news/wiki"
-Repository = "https://github.com/finaldie/auto-news"
+Homepage = "https://github.com/finaldie/news-summary"
+Documentation = "https://github.com/finaldie/news-summary/wiki"
+Repository = "https://github.com/finaldie/news-summary"
 
 [build-system]
 requires = ["hatchling"]

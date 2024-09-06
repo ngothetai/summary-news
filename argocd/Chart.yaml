@@ -1,14 +1,14 @@
-name: argo-cd apps - auto-news
-description: A Helm Chart for argo-cd apps - auto-news
+name: argo-cd apps - news-summary
+description: A Helm Chart for argo-cd apps - news-summary
 version: 1.0.0
 apiVersion: v2
 keywords:
   - argo-cd
   - apps
-  - auto-news
-home: https://github.com/finaldie/auto-news
+  - news-summary
+home: https://github.com/finaldie/news-summary
 sources:
-  - https://github.com/finaldie/auto-news
+  - https://github.com/finaldie/news-summary
 
 maintainers:
   - email: hyzwowtools@gmail.com

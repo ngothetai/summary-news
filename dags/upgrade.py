@@ -51,13 +51,13 @@ with DAG(
 
     t0 = BashOperator(
         task_id='git_pull',
-        bash_command='cd ~/airflow/run/auto-news && git pull && git log -1',
+        bash_command='cd ~/airflow/run/news-summary && git pull && git log -1',
     )
 
     t6 = BashOperator(
         task_id='finish',
         depends_on_past=False,
-        bash_command='cd ~/airflow/run/auto-news/src && python3 af_end.py '
+        bash_command='cd ~/airflow/run/news-summary/src && python3 af_end.py '
         '--start {{ ds }} '
         '--prefix=./run ',
     )

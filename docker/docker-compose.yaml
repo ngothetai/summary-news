@@ -48,13 +48,9 @@ version: '3.8'
 
 x-airflow-common:
   &airflow-common
-  # In order to add custom dependencies or upgrade provider packages you can use your extended image.
-  # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
-  # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  # image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.5.2}
-  image: ${AIRFLOW_IMAGE_NAME:-finaldie/auto-news:0.9.13}
-  # build: .
-
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
   networks:
     - bot_network
   privileged: true
@@ -213,7 +209,7 @@ services:
         echo "Picking up environment file "
         echo "=================================================="
         if [ -f ~/airflow/config/.env ]; then
-          cp ~/airflow/config/.env ~/airflow/run/auto-news/src
+          cp ~/airflow/config/.env ~/airflow/run/news-summary/src
           echo "Copied environment file to the runtime."
         else
           echo "ERROR: Environment file not found, exit"
@@ -353,7 +349,7 @@ services:
         echo "Picking up environment file "
         echo "=================================================="
         if [ -f ~/airflow/config/.env ]; then
-          cp ~/airflow/config/.env ~/airflow/run/auto-news/src
+          cp ~/airflow/config/.env ~/airflow/run/news-summary/src
           echo "Copied environment file to the runtime."
         else
           echo "ERROR: Environment file not found, exit"
@@ -362,7 +358,7 @@ services:
         echo "=================================================="
         echo "Apply patches ..."
         echo "=================================================="
-        python3 ~/airflow/run/auto-news/src/patches.py
+        python3 ~/airflow/run/news-summary/src/patches.py
         echo "Apply patches finished"
         echo "----"
         sleep 5

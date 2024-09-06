@@ -50,12 +50,12 @@ init-airflow:
 # build repo=xxx tag=1.0.0
 build:
 	@echo "Building docker image, topdir: [$(topdir)]"
-	docker build --pull --rm -t ${repo}:${tag} -f Dockerfile $(topdir)
+	docker compose --env-file $(topdir)/build/.env build 
 
 # build repo=xxx tag=1.0.0
 build-nocache:
 	@echo "Building docker image (no-cache), topdir: [$(topdir)]"
-	docker build --pull --no-cache --rm -t ${repo}:${tag} -f Dockerfile $(topdir)
+	docker compose --env-file $(topdir)/build/.env build --no-cache
 
 # push repo=xxx tag=1.0.0
 push:

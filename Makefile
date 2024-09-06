@@ -1,4 +1,4 @@
-namespace ?= auto-news
+namespace ?= news-summary
 
 help:
 	@echo "Usage:"
@@ -35,9 +35,9 @@ help:
 	@echo "\_ make k8s-airflow-dags-enable"
 	@echo ""
 	@echo "=== k8s port-fowarding ==="
-	@echo "Airflow: 'kubectl port-forward service/auto-news-webserver 8080:8080 --namespace ${namespace} --address=0.0.0.0'"
-	@echo "Milvus : 'kubectl port-forward service/auto-news-milvus-attu -n ${namespace} 9100:3001 --address=0.0.0.0'"
-	@echo "Adminer: 'kubectl port-forward service/auto-news-adminer -n ${namespace} 8070:8080 --address=0.0.0.0'"
+	@echo "Airflow: 'kubectl port-forward service/news-summary-webserver 8080:8080 --namespace ${namespace} --address=0.0.0.0'"
+	@echo "Milvus : 'kubectl port-forward service/news-summary-milvus-attu -n ${namespace} 9100:3001 --address=0.0.0.0'"
+	@echo "Adminer: 'kubectl port-forward service/news-summary-adminer -n ${namespace} 8070:8080 --address=0.0.0.0'"
 
 
 topdir := $(shell pwd)
@@ -76,7 +76,7 @@ prepare-env:
 deps: prepare-env
 # deps: docker-network
 
-repo ?= finaldie/auto-news
+repo ?= finaldie/news-summary
 tag ?= 0.9.13
 
 build:
@@ -203,7 +203,7 @@ k8s-helm-install:
 		--create-namespace \
 		--timeout=${TIMEOUT} \
 		--wait-for-jobs=true \
-		auto-news \
+		news-summary \
 		./helm
 
 k8s-helm-uninstall:
@@ -212,28 +212,28 @@ k8s-helm-uninstall:
 		--namespace=${namespace} \
 		--wait=true \
 		--debug \
-		auto-news
+		news-summary
 
 k8s-airflow-dags-enable:
 	@echo "Airflow DAGs unpausing..."
-	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags unpause news_pulling
-	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags unpause sync_dist
-	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags unpause collection_weekly
-	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags unpause journal_daily
-	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags unpause action
+	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags unpause news_pulling
+	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags unpause sync_dist
+	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags unpause collection_weekly
+	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags unpause journal_daily
+	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags unpause action
 	@echo "Airflow DAGs unpausing finished"
 
 airflow-dags-disable:
 	@echo "Airflow DAGs pausing..."
-	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags pause news_pulling
-	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags pause sync_dist
-	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags pause collection_weekly
-	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags pause journal_daily
-	kubectl exec -n ${namespace} auto-news-worker-0 -- airflow dags pause action
+	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags pause news_pulling
+	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags pause sync_dist
+	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags pause collection_weekly
+	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags pause journal_daily
+	kubectl exec -n ${namespace} news-summary-worker-0 -- airflow dags pause action
 	@echo "Airflow DAGs pausing finished"
 
 k8s-argocd-install:
-	@echo "ArgoCD: Installing Auto-News argocd helm chart..."
+	@echo "ArgoCD: Installing news-summary argocd helm chart..."
 	helm upgrade \
 		--install \
 		--debug \
@@ -241,12 +241,12 @@ k8s-argocd-install:
 		--create-namespace \
 		--timeout=${TIMEOUT} \
 		--wait=true \
-		argocd-apps-auto-news \
+		argocd-apps-news-summary \
 		./argocd
-	@echo "ArgoCD: Auto-News argocd helm chart installation finished, goto ArgoCD dashboard to check the service deployment status"
+	@echo "ArgoCD: news-summary argocd helm chart installation finished, goto ArgoCD dashboard to check the service deployment status"
 
-# Notes: uninstall argocd helm chart won't uninstall the auto-news
-# services, to uninstall auto-news, click 'Delete' button from ArgoCD
+# Notes: uninstall argocd helm chart won't uninstall the news-summary
+# services, to uninstall news-summary, click 'Delete' button from ArgoCD
 # dashboard
 k8s-argocd-uninstall:
 	@echo "ArgoCD uninstallation ..."
@@ -255,7 +255,7 @@ k8s-argocd-uninstall:
 		--wait=true \
 		--namespace=${namespace} \
 		--debug \
-		argocd-apps-auto-news
+		argocd-apps-news-summary
 
 
 .PHONY: deps build deploy deploy-env init start stop logs clean push_dags

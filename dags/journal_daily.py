@@ -47,7 +47,7 @@ with DAG(
 
     t1 = BashOperator(
         task_id='start',
-        bash_command='cd ~/airflow/run/auto-news/src && python3 af_start.py --start {{ ds }} --prefix=./run',
+        bash_command='cd ~/airflow/run/news-summary/src && python3 af_start.py --start {{ ds }} --prefix=./run',
     )
 
     t2 = BashOperator(
@@ -57,7 +57,7 @@ with DAG(
 
     t3 = BashOperator(
         task_id='pull',
-        bash_command='cd ~/airflow/run/auto-news/src && python3 af_journal_pull.py '
+        bash_command='cd ~/airflow/run/news-summary/src && python3 af_journal_pull.py '
         '--start {{ ds }} '
         '--prefix=./run '
         '--run-id={{ run_id }} '
@@ -68,7 +68,7 @@ with DAG(
 
     t4 = BashOperator(
         task_id='save',
-        bash_command='cd ~/airflow/run/auto-news/src && python3 af_journal_save.py '
+        bash_command='cd ~/airflow/run/news-summary/src && python3 af_journal_save.py '
         '--start {{ ds }} '
         '--prefix=./run '
         '--run-id={{ run_id }} '
@@ -81,7 +81,7 @@ with DAG(
     t5 = BashOperator(
         task_id='finish',
         depends_on_past=False,
-        bash_command='cd ~/airflow/run/auto-news/src && python3 af_end.py '
+        bash_command='cd ~/airflow/run/news-summary/src && python3 af_end.py '
         '--start {{ ds }} '
         '--prefix=./run ',
     )

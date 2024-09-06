@@ -1,12 +1,12 @@
-name: auto-news
-description: A Helm Chart for auto-news
+name: news-summary
+description: A Helm Chart for news-summary
 version: 1.0.0
 apiVersion: v2
 keywords:
-    - auto-news
-home: https://github.com/finaldie/auto-news
+    - news-summary
+home: https://github.com/finaldie/news-summary
 sources:
-  - https://github.com/finaldie/auto-news
+  - https://github.com/finaldie/news-summary
 
 maintainers:
   - email: hyzwowtools@gmail.com

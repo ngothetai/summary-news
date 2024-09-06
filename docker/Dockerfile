@@ -36,11 +36,11 @@ RUN set -ex; \
   && rm -rf /root/.cache/*
 
 # create a soft link ~/airflow -> /opt/airflow
-# create auto-news folders
+# create news-summary folders
 RUN set -ex; \
   ln -snf /opt/airflow ~/airflow \
-  && mkdir -p /opt/airflow/run/auto-news/src \
-  && chmod -R 777 /opt/airflow/run/auto-news/src
+  && mkdir -p /opt/airflow/run/news-summary/src \
+  && chmod -R 777 /opt/airflow/run/news-summary/src
 
 # switch to airflow user in order to install python packages
 USER airflow
@@ -58,7 +58,7 @@ RUN set -ex; \
   && rm -rf ~/.cache/pip
 
 # Install DAGs
-COPY dags/ /opt/airflow/dags/
+COPY dags /opt/airflow/dags
 
 # Install user code
-COPY ./src /opt/airflow/run/auto-news/src
+COPY src /opt/airflow/run/news-summary/src

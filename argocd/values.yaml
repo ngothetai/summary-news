@@ -2,7 +2,7 @@ project: default
 
 # global vars
 source:
-  repoURL: git@github.com:finaldie/auto-news.git
+  repoURL: git@github.com:finaldie/news-summary.git
   targetRevision: HEAD
   path: helm
 
