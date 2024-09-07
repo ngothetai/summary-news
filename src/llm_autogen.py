@@ -332,22 +332,6 @@ class LLMAgentAutoGen(LLMAgentBase):
                     "required": ["query"],
                 },
             },
-
-            {
-                "name": "scrape",
-                "description": "Scraping and summarize website content based on url",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "url": {
-                            "type": "string",
-                            "description": "Website url to scrape",
-                        }
-                    },
-                    "required": ["url"],
-                },
-            },
-
             {
                 "name": "arxiv",
                 "description": "arxiv search for relevant papers",
@@ -537,7 +521,6 @@ class LLMAgentAutoGen(LLMAgentBase):
             user_proxy.register_function(
                 function_map={
                     "search": search,
-                    # "scrape": scrape,
                     "arxiv": arxiv_search,
                 }
             )
