@@ -49,7 +49,7 @@ arxiv
 pymupdf
 
 # AutoGen
-pyautogen==0.2.7
+pyautogen==0.2.35
 docker
 duckduckgo_search
 

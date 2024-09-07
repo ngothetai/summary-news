@@ -121,6 +121,44 @@ def search(
     else:
         return results
 
+def test_search():
+    # Set env vars
+    os.environ["AN_CURRENT_WORKDIR"] = "./"
+    os.environ["AN_REF_FILENAME"] = "llm_ref.txt"
+    os.environ["AN_AUTO_SCRAPE_ENABLED"] = "True"
+
+    # Test with a simple query
+    query = "Python programming"
+    result = search(query, max_results=2, output_format="json_object")
+    
+    # Check if the result is a list
+    assert isinstance(result, list), "Result should be a list"
+    
+    # Check if we got the expected number of results
+    assert len(result) <= 2, "Should return at most 2 results"
+    
+    # Check if each result has the expected keys
+    for item in result:
+        assert "title" in item, "Each result should have a title"
+        assert "href" in item, "Each result should have a href"
+    
+    # Test with an empty query
+    empty_result = search("", output_format="json_object")
+    assert empty_result == [], "Empty query should return an empty list"
+    
+    # Test with json_string output format
+    json_result = search(query, output_format="json_string")
+    assert isinstance(json_result, str), "json_string format should return a string"
+    
+    # Try to parse the JSON string
+    try:
+        parsed_json = json.loads(json_result)
+        assert isinstance(parsed_json, list), "Parsed JSON should be a list"
+    except json.JSONDecodeError:
+        assert False, "json_string output should be valid JSON"
+
+    print("All tests passed!")
+
 
 def scrape(
     url: str = "",
@@ -255,6 +293,10 @@ def write_to_file(text: str, filename: str, work_dir: str = ""):
     # return f"{text}\n\n{filename} TERMINATE"
     return "TERMINATE"
 
+# Run the test
+if __name__ == "__main__":
+    test_search()
+
 
 #######################################################################
 # Agents
@@ -273,14 +315,6 @@ class LLMAgentAutoGen(LLMAgentBase):
         }]
 
         print(f"[LLMAgentAutoGen] Initialize GPT4 model_name: {_gpt4_model_name}")
-
-        _gpt3_model_name = os.getenv("AUTOGEN_GPT3_MODEL", "gpt-3.5-turbo-1106")
-        _gpt3_api_key = os.getenv("AUTOGEN_GPT3_API_KEY", "")
-
-        self.gpt3_config_list = [{
-            "model": _gpt3_model_name,
-            "api_key": _gpt3_api_key,
-        }]
 
         # functions
         self.functions_collection = [
@@ -383,9 +417,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             },
         ]
 
-        print(f"[LLMAgentAutoGen] Initialize GPT3 model_name: {_gpt3_model_name}")
-
-        self.llm_cfg_timeout = 180  # seconds
+        self.llm_cfg_timeout = 600  # seconds
         self.llm_cfg_max_retries = 5
 
         print(f"[LLMAgentAutoGen] Initialize config: timeout: {self.llm_cfg_timeout}, max_retries: {self.llm_cfg_max_retries}")
@@ -398,38 +430,30 @@ class LLMAgentAutoGen(LLMAgentBase):
             "config_list": self.gpt4_config_list,
         }
 
-        self.llm_config_gpt3 = {
+        self.llm_config_gpt4_pub = {
             "timeout": self.llm_cfg_timeout,
             "max_retries": self.llm_cfg_max_retries,
             "cache_seed": 42,
             "temperature": 0,
-            "config_list": self.gpt3_config_list,
-        }
-
-        self.llm_config_gpt3_pub = {
-            "timeout": self.llm_cfg_timeout,
-            "max_retries": self.llm_cfg_max_retries,
-            "cache_seed": 42,
-            "temperature": 0,
-            "config_list": self.gpt3_config_list,
+            "config_list": self.gpt4_config_list,
             "functions": self.functions_pub,
         }
 
-        self.llm_config_gpt3_collection = {
+        self.llm_config_gpt4_collection = {
             "timeout": self.llm_cfg_timeout,
             "max_retries": self.llm_cfg_max_retries,
             "cache_seed": 42,
             "temperature": 0,
-            "config_list": self.gpt3_config_list,
+            "config_list": self.gpt4_config_list,
             "functions": self.functions_collection,
         }
 
-        self.llm_config_gpt3_review = {
+        self.llm_config_gpt4_review = {
             "timeout": self.llm_cfg_timeout,
             "max_retries": self.llm_cfg_max_retries,
             "cache_seed": 42,
             "temperature": 0,
-            "config_list": self.gpt3_config_list,
+            "config_list": self.gpt4_config_list,
             "functions": self.functions_review,
         }
 
@@ -442,41 +466,41 @@ class LLMAgentAutoGen(LLMAgentBase):
         self.agent_planner = autogen.AssistantAgent(
             name="Planner",
             system_message="Planner. Suggest a plan. Revise the plan based on feedback from admin and critic, until admin approval. The plan may involve and engineer who can excute the task by provided tools/functions, or write the code only when provided functions cannot finish the task. Explain the plan first. Be clearwhich step is performed by an engineer, which step is performed by a scientist, which step is performed by a collector, and which step is performed by an editor." + self.termination_notice,
-            llm_config=self.llm_config_gpt3,
+            llm_config=self.llm_config_gpt4,
         )
 
         self.agent_collector = autogen.AssistantAgent(
             name="Collector",
             # system_message=llm_prompts.AUTOGEN_COLLECTOR + self.termination_notice,
             system_message=llm_prompts.AUTOGEN_COLLECTOR2 + self.termination_notice,
-            llm_config=self.llm_config_gpt3_collection,
+            llm_config=self.llm_config_gpt4_collection,
         )
 
         self.agent_editor = autogen.AssistantAgent(
             name="Editor",
             # system_message=llm_prompts.AUTOGEN_EDITOR + self.termination_notice,
             system_message=llm_prompts.AUTOGEN_EDITOR2 + self.termination_notice,
-            llm_config=self.llm_config_gpt3,
+            llm_config=self.llm_config_gpt4,
         )
 
         self.agent_writer = autogen.AssistantAgent(
             name="Writer",
             # system_message=llm_prompts.AUTOGEN_WRITER + self.termination_notice,
             system_message=llm_prompts.AUTOGEN_WRITER2 + self.termination_notice,
-            llm_config=self.llm_config_gpt3,
+            llm_config=self.llm_config_gpt4,
         )
 
         self.agent_reviewer = autogen.AssistantAgent(
             name="Reviewer",
             # system_message=llm_prompts.AUTOGEN_REVIEWER + self.termination_notice,
             system_message=llm_prompts.AUTOGEN_REVIEWER2 + self.termination_notice,
-            llm_config=self.llm_config_gpt3_review,
+            llm_config=self.llm_config_gpt4_review,
         )
 
         self.agent_publisher = autogen.AssistantAgent(
             name="Publisher",
             system_message=llm_prompts.AUTOGEN_PUBLISHER2 + self.termination_notice,
-            llm_config=self.llm_config_gpt3_pub,
+            llm_config=self.llm_config_gpt4_pub,
         )
 
         print("[LLMAgentAutoGen] Initialize finished")
@@ -600,7 +624,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             name="Checker",
             # system_message=llm_prompts.AUTOGEN_WRITER + self.termination_notice,
             system_message="Content Checker. According to the Reviewer's feedback, for content missing, gaps or low-quality part, find it from the provided materials first, if cannot find, leverage functions to search the content from Internet or search papers from Arxiv." + self.termination_notice,
-            llm_config=self.llm_config_gpt3_review,
+            llm_config=self.llm_config_gpt4_review,
         )
 
         agent_executor.register_function(
@@ -617,7 +641,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             # system_message=llm_prompts.AUTOGEN_EDITOR + self.termination_notice,
             # system_message=llm_prompts.AUTOGEN_EDITOR2 + self.termination_notice,
             system_message=llm_prompts.AUTOGEN_EDITOR3.format(raw_query) + self.termination_notice,
-            llm_config=self.llm_config_gpt3,
+            llm_config=self.llm_config_gpt4,
         )
 
         writer = autogen.AssistantAgent(
@@ -625,7 +649,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             # system_message=llm_prompts.AUTOGEN_WRITER + self.termination_notice,
             system_message=llm_prompts.AUTOGEN_WRITER4 + self.termination_notice,
             # system_message=llm_prompts.AUTOGEN_WRITER3.format(raw_query) + self.termination_notice,
-            llm_config=self.llm_config_gpt3,
+            llm_config=self.llm_config_gpt4,
         )
 
         # create group
@@ -646,7 +670,7 @@ class LLMAgentAutoGen(LLMAgentBase):
 
         manager = autogen.GroupChatManager(
             groupchat=groupchat,
-            llm_config=self.llm_config_gpt3,
+            llm_config=self.llm_config_gpt4,
         )
 
         # Set current workdir first
