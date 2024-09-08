@@ -306,13 +306,21 @@ class LLMAgentAutoGen(LLMAgentBase):
         super().__init__("", "")
 
         _gpt4_model_name = os.getenv("AUTOGEN_GPT4_MODEL", "gpt-4-1106-preview")
+        _gpt4_base_url = os.getenv("AUTOGEN_GPT4_BASE_URL", "")
         _gpt4_api_key = os.getenv("AUTOGEN_GPT4_API_KEY", "")
 
         # create autogen user proxy and assisants
-        self.gpt4_config_list = [{
-            "model": _gpt4_model_name,
-            "api_key": _gpt4_api_key,
-        }]
+        if _gpt4_base_url != "":
+            self.gpt4_config_list = [{
+                "model": _gpt4_model_name,
+                "base_url": _gpt4_base_url,
+                "api_key": _gpt4_api_key,
+            }]
+        else:
+            self.gpt4_config_list = [{
+                "model": _gpt4_model_name,
+                "api_key": _gpt4_api_key,
+            }]
 
         print(f"[LLMAgentAutoGen] Initialize GPT4 model_name: {_gpt4_model_name}")
 
@@ -443,7 +451,8 @@ class LLMAgentAutoGen(LLMAgentBase):
 
         # Tips: for gpt 3.5 agent keep thanking each other, append this one to the prompt to avoid it. ref: https://microsoft.github.io/autogen/docs/FAQ#agents-keep-thanking-each-other-when-using-gpt-35-turbo
         self.termination_notice = (
-            '\n\nDo not show appreciation in your responses, say only what is necessary. '
+            # '\n\nDo not show appreciation in your responses, say only what is necessary. '
+            ''
         )
 
         # agents
