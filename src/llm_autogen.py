@@ -450,10 +450,10 @@ class LLMAgentAutoGen(LLMAgentBase):
         }
 
         # Tips: for gpt 3.5 agent keep thanking each other, append this one to the prompt to avoid it. ref: https://microsoft.github.io/autogen/docs/FAQ#agents-keep-thanking-each-other-when-using-gpt-35-turbo
-        self.termination_notice = (
-            # '\n\nDo not show appreciation in your responses, say only what is necessary. '
-            ''
-        )
+        # self.termination_notice = (
+        #     '\n\nDo not show appreciation in your responses, say only what is necessary. '
+        # )
+        self.termination_notice = ("")
 
         # agents
         self.agent_planner = autogen.AssistantAgent(
@@ -650,7 +650,7 @@ class LLMAgentAutoGen(LLMAgentBase):
             agent_executor,
             editor,
             writer,
-            # checker,
+            checker,
             self.agent_reviewer,
             self.agent_publisher,
         ]

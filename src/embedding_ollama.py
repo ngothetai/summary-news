@@ -90,7 +90,7 @@ class EmbeddingOllama(Embedding):
         embedding = None
 
         if client:
-            # Tips: the quickest way to get rid of all previous
+            # Tips: the quickest wdimensionsay to get rid of all previous
             # cache, change the provider (1st arg)
             embedding = client.get_milvus_embedding_item_id(
                 "ollama-norm",
